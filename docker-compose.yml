@@ -1,8 +1,19 @@
 services:
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
     command: npm run dev
     ports:
       - '5173:5173'
     volumes:
       - ./frontend:/usr/src/app
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./backend:/usr/src/app
+    command: flask run --host=0.0.0.0
