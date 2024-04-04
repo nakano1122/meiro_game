@@ -16,4 +16,5 @@ services:
       - '5000:5000'
     volumes:
       - ./backend:/usr/src/app
+      - ./frontend/dist:/usr/src/app/frontend/dist
     command: flask run --host=0.0.0.0

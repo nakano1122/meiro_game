@@ -1,10 +1,11 @@
-# Flaskクラスをimportする
-from flask import Flask
+from flask import Flask, send_from_directory
 
-# Flaskクラスをインスタンス化する
-app = Flask(__name__)
+app = Flask(__name__, static_folder='/usr/src/app/frontend/dist', static_url_path="")
 
-# URLと実行する関数をマッピングする
-@app.route("/")
-def index():
-    return "Hello, Flaskbook!"
+@app.route("/", defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
+    return send_from_directory(app.static_folder, "index.html")
+
+if __name__ == '__main__':
+    app.run()
