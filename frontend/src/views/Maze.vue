@@ -8,15 +8,16 @@ interface Props {
 const props = defineProps<Props>();
 
 const maze = ref([]);
-const stepLimit = ref(20);
+const stepLimit = ref(0);
 const elapsedTime = ref(0);
 const timerId = ref();
 
 const getMaze = async () => {
   try {
     const response = await axios.get(`/api/start/${props.mode}`);
-    maze.value = response.data;
-    stepLimit.value = 20;
+    console.log(response.data);
+    maze.value = response.data.maze;
+    stepLimit.value = response.data.stepLimit;
   } catch (error) {
     console.error('APIからの迷路データの取得に失敗しました。', error);
   }
@@ -51,7 +52,7 @@ function formatTime(seconds: number) {
   <dl>
     <dt>残り歩数</dt>
     <dd>[[ stepLimit ]]</dd>
-    <dt>制限時間</dt>
+    <dt>経過時間</dt>
     <dd>[[ formatTime(elapsedTime) ]]</dd>
   </dl>
   <table>

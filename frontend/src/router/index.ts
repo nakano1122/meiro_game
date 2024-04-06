@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import AppTop from "@/views/AppTop.vue";
 import Maze from "@/views/Maze.vue";
-import { routes } from "vue-router/auto-routes";
 
 const routeSettings: RouteRecordRaw[] = [
   {
