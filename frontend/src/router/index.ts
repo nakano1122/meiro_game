@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import AppTop from "@/views/AppTop.vue";
-import NoviceMode from "@/views/NoviceMode.vue";
-import IntermediateMode from "@/views/IntermediateMode.vue";
-import AdvancedMode from "@/views/AdvancedMode.vue";
+import Maze from "@/views/Maze.vue";
+import { routes } from "vue-router/auto-routes";
 
 const routeSettings: RouteRecordRaw[] = [
   {
@@ -12,19 +11,14 @@ const routeSettings: RouteRecordRaw[] = [
     component: AppTop
   },
   {
-    path: "/novice",
-    name: "NoviceMode",
-    component: NoviceMode
-  },
-  {
-    path: "/intermediate",
-    name: "IntermediateMode",
-    component: IntermediateMode
-  },
-  {
-    path: "/advance",
-    name: "AdvanceMode",
-    component: AdvancedMode
+    path: "/maze/:mode",
+    name: "MazeStart",
+    component: Maze,
+    props: (routes) => {
+      return {
+        mode: routes.params.mode
+      };
+    },
   },
 ];
 
