@@ -11,7 +11,29 @@ def generate_maze():
 class NoviceModeGet(Resource):
     def get(self):
         maze = generate_maze()
-        return jsonify(maze)
+        stepLimit = 20
+        return jsonify({
+            "maze": maze,
+            "stepLimit": stepLimit,
+        })
+class IntermediateModeGet(Resource):
+    def get(self):
+        maze = generate_maze()
+        stepLimit = 20
+        return jsonify({
+            "maze": maze,
+            "stepLimit": stepLimit,
+        })
+class AdvanceModeGet(Resource):
+    def get(self):
+        maze = generate_maze()
+        stepLimit = 20
+        return jsonify({
+            "maze": maze,
+            "stepLimit": stepLimit,
+        })
 
 api = Api(api_bp)
 api.add_resource(NoviceModeGet, '/start/novice')
+api.add_resource(IntermediateModeGet, '/start/intermediate')
+api.add_resource(AdvanceModeGet, '/start/advance')
