@@ -7,16 +7,17 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const maze = ref([]);
+const maze = ref<boolean[][]>([]);
 const stepLimit = ref(0);
 const elapsedTime = ref(0);
 const timerId = ref();
+const characterPosition  = ref({ x: 7, y: 3 });
+
 
 const getMaze = async () => {
   try {
     const response = await axios.get(`/api/start/${props.mode}`);
-    console.log(response.data);
-    maze.value = response.data.maze;
+    maze.value = response.data.maze as boolean[][];
     stepLimit.value = response.data.stepLimit;
   } catch (error) {
     console.error('APIからの迷路データの取得に失敗しました。', error);
@@ -29,15 +30,46 @@ const startTimer = () => {
   }, 1000);
 };
 
+const isCharacterCell = (rowIndex:number, cellIndex:number) => {
+  return characterPosition.value.x === rowIndex && characterPosition.value.y === cellIndex;
+}
+
+const moveCharacter = (direction: string): void => {
+  const maxX = maze.value.length - 1;
+  const maxY = maze.value[0].length - 1;
+  switch (direction) {
+    case 'ArrowUp' :
+      characterPosition.value.x = Math.max(characterPosition.value.x -1, 0);
+      break;
+    case 'ArrowDown' :
+      characterPosition.value.x = Math.min(characterPosition.value.x + 1, maxX);
+      break;
+    case 'ArrowLeft':
+      characterPosition.value.y = Math.max(characterPosition.value.y - 1, 0);
+      break;
+    case 'ArrowRight':
+      characterPosition.value.y = Math.min(characterPosition.value.y + 1, maxY);
+      break;
+  }
+};
+
+const handleKeyDown = (event: KeyboardEvent): void => {
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+    moveCharacter(event.key);
+  }
+};
+
 onMounted(() => {
   startTimer();
   getMaze();
+  window.addEventListener('keydown', handleKeyDown);
 });
 
 onUnmounted(() => {
   if(timerId.value) {
     clearInterval(timerId.value);
   }
+  window.removeEventListener('keydown', handleKeyDown);
 });
 
 function formatTime(seconds: number) {
@@ -62,11 +94,11 @@ function formatTime(seconds: number) {
   </div>
     <div class="maze-container">
       <table>
-        <tr v-for="(row, rowIndex) in maze" :key="rowIndex">
-          <td v-for="(cell, cellIndex) in row" :key="cellIndex" class="maze-cell">
+        <tr v-for="(row, rowIndex) in maze" v-bind:key="rowIndex">
+          <td v-for="(cell, cellIndex) in row" v-bind:key="cellIndex" class="maze-cell" v-bind:class="{ 'character-cell': isCharacterCell(rowIndex, cellIndex) }">
             <div class="start" v-if="rowIndex === 7 && cellIndex === 3">スタート</div>
             <div class="goal" v-else-if="rowIndex === 0 && cellIndex === 3">ゴール</div>
-            <img v-else-if="cell" src="/images/coin_image.png" alt="コイン">
+            <img v-else-if="cell" src="/images/coin_image.png" alt="コイン" class="coin">
           </td>
         </tr>
       </table>
@@ -142,22 +174,36 @@ table {
   background-color: #FFFAFA;
 }
 
+.character-cell {
+  background-image: url('/images/stop_man.png');
+  background-size: cover;
+  position: relative;
+  z-index: 100;
+}
+
 .start, .goal {
-  color: #ffffff; /* 白色のテキスト */
-  font-weight: bold; /* 太字 */
+  color: #ffffff;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.8em;
   overflow: hidden;
-  white-space: nowrap; /* 改行をさせない */
+  white-space: nowrap;
+  position: relative;
+  z-index: 80;
 }
 .start {
-  background-color: #4CAF50; /* 緑色 */
+  background-color: #4CAF50;
 }
 
 .goal {
-  background-color: #FF6347; /* 赤色 */
+  background-color: #FF6347;
+}
+
+.coin {
+  position: relative;
+  z-index: 50;
 }
 
 img {
