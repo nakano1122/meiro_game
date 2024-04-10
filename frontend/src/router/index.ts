@@ -3,12 +3,24 @@ import type { RouteRecordRaw } from "vue-router";
 import AppTop from "@/views/AppTop.vue";
 import Maze from "@/views/Maze.vue";
 import Result from "@/views/Result.vue";
+import Start from "@/views/Start.vue";
+import { routes } from "vue-router/auto-routes";
 
 const routeSettings: RouteRecordRaw[] = [
   {
     path: "/",
+    name: "Start",
+    component: Start
+  },
+  {
+    path: "/TOP",
     name: "AppTop",
-    component: AppTop
+    component: AppTop,
+    props: (routes) => {
+      return {
+        name: routes.params.username
+      };
+    },
   },
   {
     path: "/maze/:mode",
