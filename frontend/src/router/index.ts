@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import AppTop from "@/views/AppTop.vue";
 import Maze from "@/views/Maze.vue";
+import Result from "@/views/Result.vue";
 
 const routeSettings: RouteRecordRaw[] = [
   {
@@ -18,6 +19,11 @@ const routeSettings: RouteRecordRaw[] = [
         mode: routes.params.mode
       };
     },
+  },
+  {
+    path: "/result",
+    name: "Result",
+    component: Result
   },
 ];
 
