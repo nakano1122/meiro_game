@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, onUnmounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 interface Props {
   mode: String;
@@ -9,10 +12,11 @@ const props = defineProps<Props>();
 
 const maze = ref<boolean[][]>([]);
 const stepLimit = ref(0);
+const collectedCoins = ref(0);
 const elapsedTime = ref(0);
 const timerId = ref();
-const characterPosition  = ref({ x: 7, y: 3 });
-
+const characterPosition = ref({ x: 7, y: 3 });
+const collectedCoinsPositions = ref<Array<{ x:number, y:number}>>([]);
 
 const getMaze = async () => {
   try {
@@ -30,18 +34,14 @@ const startTimer = () => {
   }, 1000);
 };
 
-const isCharacterCell = (rowIndex:number, cellIndex:number) => {
-  return characterPosition.value.x === rowIndex && characterPosition.value.y === cellIndex;
-}
-
 const moveCharacter = (direction: string): void => {
   const maxX = maze.value.length - 1;
   const maxY = maze.value[0].length - 1;
   switch (direction) {
-    case 'ArrowUp' :
-      characterPosition.value.x = Math.max(characterPosition.value.x -1, 0);
+    case 'ArrowUp':
+      characterPosition.value.x = Math.max(characterPosition.value.x - 1, 0);
       break;
-    case 'ArrowDown' :
+    case 'ArrowDown':
       characterPosition.value.x = Math.min(characterPosition.value.x + 1, maxX);
       break;
     case 'ArrowLeft':
@@ -51,11 +51,29 @@ const moveCharacter = (direction: string): void => {
       characterPosition.value.y = Math.min(characterPosition.value.y + 1, maxY);
       break;
   }
+
+  if (maze.value[characterPosition.value.x][characterPosition.value.y] === true) {
+    collectedCoins.value++;
+    collectedCoinsPositions.value.push({ x: characterPosition.value.x, y: characterPosition.value.y});
+  }
+};
+
+const isCharacterCell = (rowIndex: number, cellIndex: number) => {
+  return characterPosition.value.x === rowIndex && characterPosition.value.y === cellIndex;
+}
+
+const onAnimationEnd = (x: number, y: number) => {
+  maze.value[x][y] = false;
+  collectedCoinsPositions.value = collectedCoinsPositions.value.filter(pos => pos.x !== x || pos.y !== y);
 };
 
 const handleKeyDown = (event: KeyboardEvent): void => {
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
     moveCharacter(event.key);
+    stepLimit.value--;
+    if ((characterPosition.value.x === 0 && characterPosition.value.y === 3 || stepLimit.value === 0)) {
+      router.push({ name: 'Result' });
+    }
   }
 };
 
@@ -66,7 +84,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if(timerId.value) {
+  if (timerId.value) {
     clearInterval(timerId.value);
   }
   window.removeEventListener('keydown', handleKeyDown);
@@ -83,22 +101,27 @@ function formatTime(seconds: number) {
   <div class="game-container">
     <h1 class="title">コインを集めてゴールを目指そう！！</h1>
     <div class="status-bar">
-    <div class="status-card step-limit">
-      <dt>残り歩数</dt>
-      <dd>[[ stepLimit ]]</dd>
+      <div class="status-card step-limit">
+        <dt>残り歩数</dt>
+        <dd>[[ stepLimit ]]</dd>
+      </div>
+      <div class="status-card step-limit">
+        <dt>獲得コイン数</dt>
+        <dd>[[ collectedCoins ]]</dd>
+      </div>
+      <div class="status-card elapsed-time">
+        <dt>経過時間</dt>
+        <dd>[[ formatTime(elapsedTime) ]]</dd>
+      </div>
     </div>
-    <div class="status-card elapsed-time">
-      <dt>経過時間</dt>
-      <dd>[[ formatTime(elapsedTime) ]]</dd>
-    </div>
-  </div>
     <div class="maze-container">
       <table>
         <tr v-for="(row, rowIndex) in maze" v-bind:key="rowIndex">
-          <td v-for="(cell, cellIndex) in row" v-bind:key="cellIndex" class="maze-cell" v-bind:class="{ 'character-cell': isCharacterCell(rowIndex, cellIndex) }">
+          <td v-for="(cell, cellIndex) in row" v-bind:key="cellIndex" class="maze-cell"
+            v-bind:class="{ 'character-cell': isCharacterCell(rowIndex, cellIndex) }">
             <div class="start" v-if="rowIndex === 7 && cellIndex === 3">スタート</div>
             <div class="goal" v-else-if="rowIndex === 0 && cellIndex === 3">ゴール</div>
-            <img v-else-if="cell" src="/images/coin_image.png" alt="コイン" class="coin">
+            <img v-else-if="cell" src="/images/coin_image.png" alt="コイン" class="coin" v-bind:class="{ 'get-coin': collectedCoinsPositions.some(pos => pos.x === rowIndex && pos.y === cellIndex) }" v-on:animationend="onAnimationEnd(rowIndex, cellIndex)">
           </td>
         </tr>
       </table>
@@ -181,7 +204,8 @@ table {
   z-index: 100;
 }
 
-.start, .goal {
+.start,
+.goal {
   color: #ffffff;
   font-weight: bold;
   display: flex;
@@ -193,6 +217,7 @@ table {
   position: relative;
   z-index: 80;
 }
+
 .start {
   background-color: #4CAF50;
 }
@@ -204,6 +229,25 @@ table {
 .coin {
   position: relative;
   z-index: 50;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+.get-coin {
+  animation: bounce 0.5s ease-out;
 }
 
 img {
