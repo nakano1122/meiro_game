@@ -5,5 +5,5 @@ import type AppTop from './AppTop.vue';
 
 <template>
     <h1>結果発表</h1>
-    <RouterLink v-bind:to="{ name: 'AppTop' }">TOPに戻る</RouterLink>
+    <RouterLink v-bind:to="{ name: 'Start' }">スタート画面に戻る</RouterLink>
 </template>

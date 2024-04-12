@@ -4,7 +4,6 @@ import AppTop from "@/views/AppTop.vue";
 import Maze from "@/views/Maze.vue";
 import Result from "@/views/Result.vue";
 import Start from "@/views/Start.vue";
-import { routes } from "vue-router/auto-routes";
 
 const routeSettings: RouteRecordRaw[] = [
   {
@@ -18,7 +17,7 @@ const routeSettings: RouteRecordRaw[] = [
     component: AppTop,
     props: (routes) => {
       return {
-        name: routes.params.username
+        username: routes.params.username
       };
     },
   },
