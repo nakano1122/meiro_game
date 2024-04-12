@@ -12,9 +12,9 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
+    command: ["python3", "app.py", "--host=0.0.0.0"]
     ports:
       - '5000:5000'
     volumes:
       - ./backend:/usr/src/app
       - ./frontend/dist:/usr/src/app/frontend/dist
-    command: flask run --host=0.0.0.0
