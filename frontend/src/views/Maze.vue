@@ -16,7 +16,7 @@ const collectedCoins = ref(0);
 const elapsedTime = ref(0);
 const timerId = ref();
 const characterPosition = ref({ x: 7, y: 3 });
-const collectedCoinsPositions = ref<Array<{ x:number, y:number}>>([]);
+const collectedCoinsPositions = ref<Array<{ x: number, y: number }>>([]);
 
 const getMaze = async () => {
   try {
@@ -54,7 +54,7 @@ const moveCharacter = (direction: string): void => {
 
   if (maze.value[characterPosition.value.x][characterPosition.value.y] === true) {
     collectedCoins.value++;
-    collectedCoinsPositions.value.push({ x: characterPosition.value.x, y: characterPosition.value.y});
+    collectedCoinsPositions.value.push({ x: characterPosition.value.x, y: characterPosition.value.y });
   }
 };
 
@@ -121,7 +121,9 @@ function formatTime(seconds: number) {
             v-bind:class="{ 'character-cell': isCharacterCell(rowIndex, cellIndex) }">
             <div class="start" v-if="rowIndex === 7 && cellIndex === 3">スタート</div>
             <div class="goal" v-else-if="rowIndex === 0 && cellIndex === 3">ゴール</div>
-            <img v-else-if="cell" src="/images/coin_image.png" alt="コイン" class="coin" v-bind:class="{ 'get-coin': collectedCoinsPositions.some(pos => pos.x === rowIndex && pos.y === cellIndex) }" v-on:animationend="onAnimationEnd(rowIndex, cellIndex)">
+            <img v-else-if="cell" src="/images/coin_image.png" alt="コイン" class="coin"
+              v-bind:class="{ 'get-coin': collectedCoinsPositions.some(pos => pos.x === rowIndex && pos.y === cellIndex) }"
+              v-on:animationend="onAnimationEnd(rowIndex, cellIndex)">
           </td>
         </tr>
       </table>
@@ -236,10 +238,12 @@ table {
     transform: translateY(0);
     opacity: 1;
   }
+
   50% {
     transform: translateY(-20px);
     opacity: 1;
   }
+
   100% {
     transform: translateY(0);
     opacity: 0;

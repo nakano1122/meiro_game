@@ -9,8 +9,3 @@ RUN pip install --upgrade pip
 RUN pip install --upgrade flask
 RUN pip install -r requirements.txt
 RUN pip install flask_sqlalchemy
-RUN pip install flask-restful
-
-# COPY . .
-
-# CMD [ "python3", "app.py" ]
