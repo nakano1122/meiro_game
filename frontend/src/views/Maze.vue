@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, onUnmounted } from 'vue';
+import { onMounted, ref, onUnmounted, inject } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/userStore';
 
 const router = useRouter();
+const userStore = useUserStore();
+const username = userStore.username;
 
 interface Props {
   mode: String;
@@ -72,8 +75,33 @@ const handleKeyDown = (event: KeyboardEvent): void => {
     moveCharacter(event.key);
     stepLimit.value--;
     if ((characterPosition.value.x === 0 && characterPosition.value.y === 3 || stepLimit.value === 0)) {
-      router.push({ name: 'Result' });
+      resultPost(username, props.mode, elapsedTime.value, collectedCoins.value)
+        .then(() => {
+          router.push({ name: 'Result' });
+        })
+        .catch(error => {
+          console.error('結果の送信中にエラーが発生しました。', error);
+        });
     }
+  }
+};
+
+const resultPost = async (
+  username: String,
+  level: String,
+  clearTime: number,
+  collectedCoins: number
+): Promise<void> => {
+  try {
+    const response = await axios.post('/api/resultPost', {
+      username: username,
+      level: level,
+      clearTime: clearTime,
+      collectedCoins: collectedCoins
+    });
+    console.log(response.data.message);
+  } catch (error) {
+    console.error('データ登録に失敗しました。', error);
   }
 };
 

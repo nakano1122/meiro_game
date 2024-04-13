@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { inject } from 'vue';
+import { RouterLink } from 'vue-router';
+import { useUserStore } from '@/stores/userStore';
 
-const route = useRoute();
-const username = route.query.username;
+const userStore = useUserStore();
+const username = userStore.username;
 </script>
 
 <template>
