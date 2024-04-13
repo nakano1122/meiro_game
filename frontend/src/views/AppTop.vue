@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { inject } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
 
@@ -11,14 +10,19 @@ const username = userStore.username;
   <div class="game-intro-container">
     <h1>迷路ゲーム！！</h1>
     <h2>[[ username ]]の挑戦</h2>
+    <section>
+      <h2>ゲーム説明</h2>
+      <p>なるべく多くのコインを集めて、なるべく早くゴールに向かいましょう！</p>
+      <p>歩数には制限があるので注意！！</p>
+    </section>
     <el-button type="success" plain>
-      <RouterLink v-bind:to="{name: 'MazeStart', params: {mode: 'novice'}}">初級</RouterLink>
+      <RouterLink v-bind:to="{name: 'MazeStart', params: {level: 'novice'}}">初級</RouterLink>
     </el-button>
     <el-button type="success" plain>
-      <RouterLink v-bind:to="{name: 'MazeStart', params: {mode: 'intermediate'}}">中級</RouterLink>
+      <RouterLink v-bind:to="{name: 'MazeStart', params: {level: 'intermediate'}}">中級</RouterLink>
     </el-button>
     <el-button type="success" plain>
-      <RouterLink v-bind:to="{name: 'MazeStart', params: {mode: 'advance'}}">上級</RouterLink>
+      <RouterLink v-bind:to="{name: 'MazeStart', params: {level: 'advance'}}">上級</RouterLink>
     </el-button>
   </div>
 </template>
