@@ -52,32 +52,29 @@ def result_post(username, level, collectedCoins, clearTime):
 Ranking = namedtuple('Ranking', [
     'result_id',
     'username',
-    'level',
     'clear_time',
     'collected_coins',
     'timestamp'
 ])
-def get_ranking():
+def get_ranking(level):
     rank5_init = db.session.query(
         Results.id,
         Users.username,
-        Results.level,
         Results.clearTime,
         Results.collectedCoins,
         Results.timestamp
     ).join(Users, Users.id == Results.user_id
-    ).order_by(
+    ).filter(Results.level == level).order_by(
     desc(Results.collectedCoins),
-    desc(Results.clearTime)
+    Results.clearTime
     ).limit(5).all()
 
     rank5 = [Ranking(
         result_id=row[0],
         username=row[1],
-        level=row[2],
-        clear_time=row[3],
-        collected_coins=row[4],
-        timestamp=row[5]
+        clear_time=row[2],
+        collected_coins=row[3],
+        timestamp=row[4]
     ) for row in rank5_init]
     
     # デバッグ用コード
