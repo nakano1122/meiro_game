@@ -15,11 +15,6 @@ const routeSettings: RouteRecordRaw[] = [
     path: "/TOP",
     name: "AppTop",
     component: AppTop,
-    props: (routes) => {
-      return {
-        username: routes.params.username
-      };
-    },
   },
   {
     path: "/maze/:mode",

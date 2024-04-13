@@ -2,14 +2,18 @@
 import router from '@/router';
 import axios from 'axios';
 import { ref } from 'vue';
+import { useUserStore } from '@/stores/userStore';
+
+const userStore = useUserStore();
 const username = ref('');
 
 const onFormSubmit = async (): Promise<void> => {
   try {
     const response = await axios.post('/api/addUser', {
-      name: username.value
+      username: username.value
     });
-    router.push({ name: 'AppTop', query: { username: username.value } });
+    userStore.setUsername(username.value);
+    router.push({ name: 'AppTop' });
   } catch (error) {
     console.error('データ登録に失敗しました。', error);
   }

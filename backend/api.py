@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, views
-from models import add_user
+from models import add_user, get_ranking, result_post
 import random
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -21,12 +21,44 @@ class MazeModeView(views.MethodView):
 class AddUserView(views.MethodView):
     def post(self):
         data = request.get_json()
-        name = data.get('name')
-        if name:
-            add_user(name=name)
-            return jsonify({'message': 'ユーザー名が正常に登録されました。'})
+        username = data.get('username')
+        try:
+            add_user(username=username)
+            return jsonify({'message', 'ユーザー登録に成功しました'})
+        except Exception as e:
+            return jsonify({'message': f'ユーザー登録に失敗しました。エラー内容: {str(e)}'})
+
+class ResultPostView(views.MethodView):
+    def post(self):
+        data = request.get_json()
+        username = data.get('username')
+        level = data.get('level')
+        collectedCoins = data.get('collectedCoins')
+        clearTime = data.get('clearTime')
+        try:
+            result_post(
+                username=username,
+                level=level,
+                collectedCoins=collectedCoins,
+                clearTime=clearTime
+            )
+            return jsonify({'message': '結果の登録に成功しました'})
+        except Exception as e:
+            return jsonify({'message': f'結果の登録に失敗しました。エラー内容: {str(e)}'})
+
+class ResultView(views.MethodView):
+    def get(self):
+        rank5 = get_ranking()
+        if rank5:
+            results_dict = [r._asdict() for r in rank5]
+            return jsonify({
+                'results': results_dict,
+                'message': 'データ取得に成功しました。'
+            })
         else:
-            return jsonify({'error': '登録に失敗しました。'}), 400
+            return jsonify({'error': 'データ取得に失敗しました。ランキングデータが存在しません。'}), 400
 
 api_bp.add_url_rule('/start/<string:mode>', view_func=MazeModeView.as_view('maze_mode'))
+api_bp.add_url_rule('/resultPost', view_func=ResultPostView.as_view('result_post'))
+api_bp.add_url_rule('/result', view_func=ResultView.as_view('get_result_ranking'))
 api_bp.add_url_rule('/addUser', view_func=AddUserView.as_view('add_user'))
