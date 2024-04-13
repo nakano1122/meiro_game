@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, onUnmounted, inject } from 'vue';
+import { onMounted, ref, onUnmounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
@@ -9,7 +9,7 @@ const userStore = useUserStore();
 const username = userStore.username;
 
 interface Props {
-  mode: String;
+  level: string;
 }
 const props = defineProps<Props>();
 
@@ -23,7 +23,7 @@ const collectedCoinsPositions = ref<Array<{ x: number, y: number }>>([]);
 
 const getMaze = async () => {
   try {
-    const response = await axios.get(`/api/start/${props.mode}`);
+    const response = await axios.get(`/api/start/${props.level}`);
     maze.value = response.data.maze as boolean[][];
     stepLimit.value = response.data.stepLimit;
   } catch (error) {
@@ -74,14 +74,16 @@ const handleKeyDown = (event: KeyboardEvent): void => {
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
     moveCharacter(event.key);
     stepLimit.value--;
-    if ((characterPosition.value.x === 0 && characterPosition.value.y === 3 || stepLimit.value === 0)) {
-      resultPost(username, props.mode, elapsedTime.value, collectedCoins.value)
+    if (characterPosition.value.x === 0 && characterPosition.value.y === 3) {
+      resultPost(username, props.level, elapsedTime.value, collectedCoins.value)
         .then(() => {
-          router.push({ name: 'Result' });
+          router.push({ name: 'Result', params: {level: props.level} });
         })
         .catch(error => {
           console.error('結果の送信中にエラーが発生しました。', error);
         });
+    } else if (stepLimit.value === 0) {
+      router.push({name: 'Fail'})
     }
   }
 };

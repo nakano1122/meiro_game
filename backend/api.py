@@ -8,12 +8,17 @@ def generate_maze():
     board = [[random.choice([True, False]) for _ in range(7)] for _ in range(8)]
     return board
 
-class MazeModeView(views.MethodView):
-    def get(self, mode):
+class MazeView(views.MethodView):
+    def get(self, level):
         maze = generate_maze()
-        stepLimit = 20
+        if level == 'novice':
+            stepLimit = 20
+        elif level == 'intermediate':
+            stepLimit = 30
+        elif level == 'advance':
+            stepLimit = 50
         return jsonify({
-            "mode": mode,
+            "level": level,
             "maze": maze,
             "stepLimit": stepLimit,
         })
@@ -47,8 +52,8 @@ class ResultPostView(views.MethodView):
             return jsonify({'message': f'結果の登録に失敗しました。エラー内容: {str(e)}'})
 
 class ResultView(views.MethodView):
-    def get(self):
-        rank5 = get_ranking()
+    def get(self, level):
+        rank5 = get_ranking(level=level)
         if rank5:
             results_dict = [r._asdict() for r in rank5]
             return jsonify({
@@ -58,7 +63,7 @@ class ResultView(views.MethodView):
         else:
             return jsonify({'error': 'データ取得に失敗しました。ランキングデータが存在しません。'}), 400
 
-api_bp.add_url_rule('/start/<string:mode>', view_func=MazeModeView.as_view('maze_mode'))
+api_bp.add_url_rule('/start/<string:level>', view_func=MazeView.as_view('maze'))
 api_bp.add_url_rule('/resultPost', view_func=ResultPostView.as_view('result_post'))
-api_bp.add_url_rule('/result', view_func=ResultView.as_view('get_result_ranking'))
+api_bp.add_url_rule('/result/<string:level>', view_func=ResultView.as_view('get_result_ranking'))
 api_bp.add_url_rule('/addUser', view_func=AddUserView.as_view('add_user'))

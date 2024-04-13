@@ -4,6 +4,7 @@ import AppTop from "@/views/AppTop.vue";
 import Maze from "@/views/Maze.vue";
 import Result from "@/views/Result.vue";
 import Start from "@/views/Start.vue";
+import Fail from "@/views/Fail.vue";
 
 const routeSettings: RouteRecordRaw[] = [
   {
@@ -17,19 +18,29 @@ const routeSettings: RouteRecordRaw[] = [
     component: AppTop,
   },
   {
-    path: "/maze/:mode",
+    path: "/maze/:level",
     name: "MazeStart",
     component: Maze,
     props: (routes) => {
       return {
-        mode: routes.params.mode
+        level: routes.params.level
       };
     },
   },
   {
-    path: "/result",
+    path: "/result/:level",
     name: "Result",
-    component: Result
+    component: Result,
+    props: (routes) => {
+      return {
+        level: routes.params.level
+      }
+    }
+  },
+  {
+    path: "/fail",
+    name: "Fail",
+    component: Fail
   },
 ];
 
