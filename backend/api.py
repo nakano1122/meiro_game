@@ -4,19 +4,26 @@ import random
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
-def generate_maze():
-    board = [[random.choice([True, False]) for _ in range(7)] for _ in range(8)]
+def generate_maze(coin_num):
+    total_cells = 7 * 8
+    if coin_num > total_cells:
+        raise ValueError("設定できるコインの枚数が上限を超えています。")
+    values = [True] * coin_num + [False] * (total_cells - coin_num)
+    random.shuffle(values)
+    board = [values[i * 7:(i + 1) * 7] for i in range(8)]
     return board
 
 class MazeView(views.MethodView):
     def get(self, level):
-        maze = generate_maze()
         if level == 'novice':
             stepLimit = 20
+            maze = generate_maze(stepLimit)
         elif level == 'intermediate':
             stepLimit = 30
+            maze = generate_maze(stepLimit)
         elif level == 'advance':
             stepLimit = 50
+            maze = generate_maze(stepLimit)
         return jsonify({
             "level": level,
             "maze": maze,
